@@ -1,0 +1,1183 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Gauss Seidel Calculator</title>
+
+    <style>
+
+        /* =====================================================
+           GENERAL
+        ===================================================== */
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: Georgia, "Times New Roman", serif;
+
+            background:
+                radial-gradient(
+                    circle at top right,
+                    rgba(67, 39, 82, 0.45),
+                    transparent 35%
+                ),
+                radial-gradient(
+                    circle at bottom left,
+                    rgba(86, 59, 40, 0.35),
+                    transparent 35%
+                ),
+                #0d0b0d;
+
+            color: #eee5d5;
+            line-height: 1.7;
+        }
+
+
+        /* =====================================================
+           NAVIGATION
+        ===================================================== */
+
+        nav {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+
+            background: rgba(13, 11, 13, 0.92);
+
+            backdrop-filter: blur(12px);
+
+            border-bottom: 1px solid #3d2a43;
+
+            padding: 18px 8%;
+        }
+
+        .nav-inner {
+            max-width: 1200px;
+            margin: auto;
+
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            color: #d9c5a3;
+            font-size: 19px;
+            font-weight: bold;
+            letter-spacing: 2px;
+        }
+
+        nav a {
+            color: #bcae9c;
+            text-decoration: none;
+            margin-left: 25px;
+            transition: 0.3s;
+        }
+
+        nav a:hover {
+            color: #d8bfe4;
+        }
+
+
+        /* =====================================================
+           HERO
+        ===================================================== */
+
+        .hero {
+            min-height: 80vh;
+
+            display: flex;
+            align-items: center;
+
+            padding: 90px 8%;
+
+            background:
+                linear-gradient(
+                    rgba(13, 11, 13, 0.45),
+                    rgba(13, 11, 13, 0.95)
+                );
+        }
+
+        .hero-content {
+            max-width: 1050px;
+            margin: auto;
+        }
+
+        .eyebrow {
+            color: #a99173;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            font-size: 14px;
+            margin-bottom: 20px;
+        }
+
+        h1 {
+            font-size: clamp(42px, 7vw, 86px);
+            line-height: 1.05;
+
+            color: #f1e6d2;
+
+            margin-bottom: 25px;
+        }
+
+        .hero-description {
+            max-width: 750px;
+
+            font-size: 19px;
+
+            color: #bdb2a5;
+        }
+
+        .scroll-button {
+            display: inline-block;
+
+            margin-top: 40px;
+
+            padding: 14px 25px;
+
+            border: 1px solid #70557a;
+            border-radius: 30px;
+
+            color: #e0d0b8;
+
+            text-decoration: none;
+
+            transition: 0.3s;
+        }
+
+        .scroll-button:hover {
+            background: #36263d;
+            transform: translateY(-3px);
+        }
+
+
+        /* =====================================================
+           INFORMATION SECTIONS
+        ===================================================== */
+
+        .section {
+            max-width: 1050px;
+
+            margin: auto;
+
+            padding: 100px 25px;
+        }
+
+        .section-label {
+            color: #a99173;
+
+            text-transform: uppercase;
+
+            letter-spacing: 3px;
+
+            font-size: 13px;
+
+            margin-bottom: 12px;
+        }
+
+        h2 {
+            color: #e8d9c3;
+
+            font-size: clamp(30px, 5vw, 48px);
+
+            margin-bottom: 30px;
+        }
+
+        .info-card {
+            background:
+                linear-gradient(
+                    135deg,
+                    rgba(48, 34, 52, 0.88),
+                    rgba(38, 29, 27, 0.92)
+                );
+
+            border: 1px solid #49384a;
+
+            border-radius: 20px;
+
+            padding: 35px;
+
+            box-shadow:
+                0 20px 60px rgba(0, 0, 0, 0.35);
+
+            margin-bottom: 50px;
+        }
+
+        .info-card p {
+            color: #c6bbae;
+
+            font-size: 17px;
+        }
+
+
+        /* =====================================================
+           CALCULATOR SECTION
+        ===================================================== */
+
+        #calculator {
+            padding-top: 80px;
+        }
+
+        .calculator-wrapper {
+            background:
+                linear-gradient(
+                    145deg,
+                    #171119,
+                    #241b18
+                );
+
+            border: 1px solid #4c3a4f;
+
+            border-radius: 25px;
+
+            padding: clamp(20px, 5vw, 50px);
+
+            box-shadow:
+                0 30px 90px rgba(0, 0, 0, 0.5);
+        }
+
+        .calculator-title {
+            margin-bottom: 10px;
+        }
+
+        .calculator-subtitle {
+            color: #a99b8d;
+            margin-bottom: 35px;
+        }
+
+
+        /* =====================================================
+           MATRIX
+        ===================================================== */
+
+        .input-section-title {
+            color: #d6c4a7;
+
+            margin: 35px 0 18px;
+
+            font-size: 20px;
+        }
+
+        .matrix-container {
+            display: flex;
+
+            justify-content: center;
+
+            align-items: center;
+
+            gap: 12px;
+
+            flex-wrap: wrap;
+        }
+
+        .matrix-box {
+            border: 2px solid #70557a;
+
+            border-radius: 14px;
+
+            padding: 15px;
+
+            background: #100d11;
+
+            position: relative;
+        }
+
+        .matrix-grid {
+            display: grid;
+
+            grid-template-columns:
+                repeat(3, minmax(70px, 100px));
+
+            gap: 10px;
+        }
+
+        .matrix-bracket {
+            font-size: 70px;
+
+            color: #bfa9c7;
+
+            line-height: 1;
+        }
+
+
+        /* =====================================================
+           INPUTS
+        ===================================================== */
+
+        input {
+            width: 100%;
+
+            background: #0d0b0d;
+
+            border: 1px solid #54434f;
+
+            color: #eee5d5;
+
+            border-radius: 9px;
+
+            padding: 12px;
+
+            font-size: 16px;
+
+            font-family: inherit;
+
+            outline: none;
+
+            transition: 0.3s;
+        }
+
+        input:focus {
+            border-color: #a17caf;
+
+            box-shadow:
+                0 0 0 3px rgba(161, 124, 175, 0.12);
+        }
+
+        .vector-grid {
+            display: grid;
+
+            grid-template-columns:
+                repeat(3, minmax(70px, 120px));
+
+            gap: 10px;
+
+            justify-content: center;
+        }
+
+
+        /* =====================================================
+           SETTINGS
+        ===================================================== */
+
+        .settings-grid {
+            display: grid;
+
+            grid-template-columns:
+                repeat(auto-fit, minmax(200px, 1fr));
+
+            gap: 18px;
+
+            margin-top: 20px;
+        }
+
+        .setting {
+            background: #171217;
+
+            padding: 18px;
+
+            border-radius: 12px;
+
+            border: 1px solid #3e303f;
+        }
+
+        .setting label {
+            display: block;
+
+            color: #b8aa9a;
+
+            margin-bottom: 8px;
+        }
+
+
+        /* =====================================================
+           CALCULATE BUTTON
+        ===================================================== */
+
+        .calculate-button {
+            width: 100%;
+
+            margin-top: 40px;
+
+            padding: 17px;
+
+            border: none;
+
+            border-radius: 13px;
+
+            background:
+                linear-gradient(
+                    135deg,
+                    #4d3459,
+                    #6c4b3d
+                );
+
+            color: #f5ead8;
+
+            font-size: 18px;
+
+            font-weight: bold;
+
+            font-family: inherit;
+
+            cursor: pointer;
+
+            letter-spacing: 1px;
+
+            transition: 0.3s;
+        }
+
+        .calculate-button:hover {
+            transform: translateY(-3px);
+
+            box-shadow:
+                0 15px 35px rgba(0, 0, 0, 0.4);
+        }
+
+
+        /* =====================================================
+           ERROR
+        ===================================================== */
+
+        .error {
+            margin-top: 25px;
+
+            padding: 18px;
+
+            border-radius: 12px;
+
+            background: #351b1b;
+
+            border: 1px solid #714343;
+
+            color: #e7b7a9;
+        }
+
+
+        /* =====================================================
+           RESULTS
+        ===================================================== */
+
+        .results {
+            margin-top: 50px;
+
+            animation: fadeIn 0.6s ease;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(15px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .status {
+            padding: 20px;
+
+            border-radius: 14px;
+
+            margin-bottom: 30px;
+
+            border: 1px solid #554452;
+
+            background: #181318;
+        }
+
+        .status.success {
+            border-color: #58694d;
+            background: #182016;
+        }
+
+        .status.warning {
+            border-color: #765d42;
+            background: #211a14;
+        }
+
+        .status h3 {
+            margin-bottom: 5px;
+        }
+
+        .solution-grid {
+            display: grid;
+
+            grid-template-columns:
+                repeat(3, 1fr);
+
+            gap: 15px;
+
+            margin-bottom: 35px;
+        }
+
+        .solution-card {
+            padding: 25px;
+
+            text-align: center;
+
+            border-radius: 15px;
+
+            background:
+                linear-gradient(
+                    145deg,
+                    #2b2130,
+                    #29201c
+                );
+
+            border: 1px solid #4c3b4c;
+        }
+
+        .solution-card .variable {
+            color: #aa8fb5;
+
+            font-size: 15px;
+
+            letter-spacing: 2px;
+        }
+
+        .solution-card .value {
+            font-size: 27px;
+
+            color: #eadbc4;
+
+            margin-top: 7px;
+
+            word-break: break-word;
+        }
+
+
+        /* =====================================================
+           ITERATION TABLE
+        ===================================================== */
+
+        .table-container {
+            overflow-x: auto;
+
+            border-radius: 15px;
+
+            border: 1px solid #463747;
+        }
+
+        table {
+            width: 100%;
+
+            border-collapse: collapse;
+
+            min-width: 550px;
+        }
+
+        th {
+            background: #2d2031;
+
+            color: #d8c4a5;
+
+            padding: 15px;
+
+            text-align: center;
+        }
+
+        td {
+            padding: 13px;
+
+            text-align: center;
+
+            border-top: 1px solid #352c35;
+
+            color: #c6bbae;
+        }
+
+        tr:nth-child(even) {
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+
+        /* =====================================================
+           FOOTER
+        ===================================================== */
+
+        footer {
+            text-align: center;
+
+            padding: 60px 20px;
+
+            color: #82786e;
+
+            border-top: 1px solid #302832;
+
+            margin-top: 50px;
+        }
+
+
+        /* =====================================================
+           MOBILE
+        ===================================================== */
+
+        @media (max-width: 650px) {
+
+            nav {
+                padding: 15px 5%;
+            }
+
+            nav a {
+                display: none;
+            }
+
+            .hero {
+                padding: 70px 7%;
+            }
+
+            .section {
+                padding: 70px 18px;
+            }
+
+            .matrix-grid {
+                grid-template-columns:
+                    repeat(3, 65px);
+            }
+
+            .solution-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .info-card {
+                padding: 25px;
+            }
+        }
+
+    </style>
+</head>
+
+
+<body>
+
+
+<!-- =====================================================
+     NAVIGATION
+===================================================== -->
+
+<nav>
+
+    <div class="nav-inner">
+
+        <div class="logo">
+            GS / CALCULATOR
+        </div>
+
+        <div>
+            <a href="#method">Method</a>
+            <a href="#how-it-works">How It Works</a>
+            <a href="#calculator">Calculator</a>
+        </div>
+
+    </div>
+
+</nav>
+
+
+
+<!-- =====================================================
+     HERO
+===================================================== -->
+
+<section class="hero">
+
+    <div class="hero-content">
+
+        <div class="eyebrow">
+            Numerical Linear Algebra
+        </div>
+
+        <h1>
+            GAUSS SEIDEL<br>
+            CALCULATOR
+        </h1>
+
+        <p class="hero-description">
+            An interactive numerical calculator for solving
+            systems of linear equations using the Gauss-Seidel
+            iterative method.
+        </p>
+
+        <a href="#method" class="scroll-button">
+            Explore the method ↓
+        </a>
+
+    </div>
+
+</section>
+
+
+
+<!-- =====================================================
+     WHAT IS GAUSS SEIDEL?
+===================================================== -->
+
+<section class="section" id="method">
+
+    <div class="section-label">
+        The method
+    </div>
+
+    <h2>
+        What is the Gauss Seidel method?
+    </h2>
+
+    <div class="info-card">
+
+        <p>
+            In numerical linear algebra, the Gauss–Seidel method,
+            also known as the Liebmann method or the method of
+            successive displacement, is an iterative method used
+            to solve a system of linear equations. It is named
+            after the German mathematicians Carl Friedrich Gauss
+            and Philipp Ludwig von Seidel. Though it can be
+            applied to any matrix with non-zero elements on the
+            diagonals, convergence is only guaranteed if the
+            matrix is either strictly diagonally dominant or
+            symmetric and positive definite.
+        </p>
+
+    </div>
+
+</section>
+
+
+
+<!-- =====================================================
+     HOW THIS APP WORKS
+===================================================== -->
+
+<section class="section" id="how-it-works">
+
+    <div class="section-label">
+        Behind the calculator
+    </div>
+
+    <h2>
+        How this app works
+    </h2>
+
+    <div class="info-card">
+
+        <p>
+            To build this Gauss-Seidel application, I used Python
+            as the core programming logic to solve systems of
+            linear equations iteratively. I designed a clean user
+            input system where users can enter their coefficient
+            matrix, right-hand side vector, initial guesses, and
+            desired tolerance levels. The script implements the
+            iterative Gauss-Seidel formula, updating each variable
+            sequentially using the most recently calculated values
+            within the same iteration loop. I also added
+            error-checking to detect if the input matrix is
+            diagonally dominant—which ensures the method converges—
+            and set a maximum iteration limit to prevent infinite
+            loops if a solution does not exist.
+        </p>
+
+    </div>
+
+</section>
+
+
+
+<!-- =====================================================
+     CALCULATOR
+===================================================== -->
+
+<section class="section" id="calculator">
+
+    <div class="calculator-wrapper">
+
+        <div class="section-label">
+            Interactive calculator
+        </div>
+
+        <h2 class="calculator-title">
+            Solve your system
+        </h2>
+
+        <p class="calculator-subtitle">
+            Enter the coefficients of your 3 × 3 system,
+            choose your initial guesses and define the desired
+            accuracy.
+        </p>
+
+
+        <form method="POST">
+
+
+            <!-- =============================================
+                 MATRIX
+            ============================================== -->
+
+            <div class="input-section-title">
+                Coefficient Matrix — A
+            </div>
+
+            <div class="matrix-container">
+
+                <div class="matrix-bracket">
+                    [
+                </div>
+
+                <div class="matrix-box">
+
+                    <div class="matrix-grid">
+
+                        {% for i in range(3) %}
+
+                            {% for j in range(3) %}
+
+                                <input
+                                    type="number"
+                                    step="any"
+                                    name="a{{ i }}{{ j }}"
+                                    value="{{ matrix[i][j] }}"
+                                    required
+                                >
+
+                            {% endfor %}
+
+                        {% endfor %}
+
+                    </div>
+
+                </div>
+
+                <div class="matrix-bracket">
+                    ]
+                </div>
+
+            </div>
+
+
+            <!-- =============================================
+                 RHS VECTOR
+            ============================================== -->
+
+            <div class="input-section-title">
+                Right-Hand Side Vector — B
+            </div>
+
+            <div class="vector-grid">
+
+                {% for i in range(3) %}
+
+                    <input
+                        type="number"
+                        step="any"
+                        name="b{{ i }}"
+                        value="{{ rhs[i] }}"
+                        required
+                    >
+
+                {% endfor %}
+
+            </div>
+
+
+            <!-- =============================================
+                 INITIAL GUESS
+            ============================================== -->
+
+            <div class="input-section-title">
+                Initial Guess
+            </div>
+
+            <div class="vector-grid">
+
+                {% for i in range(3) %}
+
+                    <input
+                        type="number"
+                        step="any"
+                        name="x{{ i }}"
+                        value="{{ initial_guess[i] }}"
+                        required
+                    >
+
+                {% endfor %}
+
+            </div>
+
+
+            <!-- =============================================
+                 SETTINGS
+            ============================================== -->
+
+            <div class="input-section-title">
+                Calculation Settings
+            </div>
+
+            <div class="settings-grid">
+
+                <div class="setting">
+
+                    <label for="tolerance">
+                        Tolerance
+                    </label>
+
+                    <input
+                        type="number"
+                        id="tolerance"
+                        name="tolerance"
+                        step="any"
+                        value="{{ tolerance }}"
+                        required
+                    >
+
+                </div>
+
+
+                <div class="setting">
+
+                    <label for="max_iterations">
+                        Maximum Iterations
+                    </label>
+
+                    <input
+                        type="number"
+                        id="max_iterations"
+                        name="max_iterations"
+                        min="1"
+                        value="{{ max_iterations }}"
+                        required
+                    >
+
+                </div>
+
+            </div>
+
+
+            <!-- =============================================
+                 CALCULATE BUTTON
+            ============================================== -->
+
+            <button
+                type="submit"
+                class="calculate-button"
+            >
+                CALCULATE
+            </button>
+
+
+        </form>
+
+
+        <!-- =================================================
+             ERROR MESSAGE
+        ================================================== -->
+
+        {% if error %}
+
+            <div class="error">
+                <strong>Input Error:</strong>
+                {{ error }}
+            </div>
+
+        {% endif %}
+
+
+
+        <!-- =================================================
+             RESULTS
+        ================================================== -->
+
+        {% if result %}
+
+        <div class="results">
+
+            <!-- =============================================
+                 STATUS
+            ============================================== -->
+
+            <div class="
+                status
+                {% if result.success %}
+                    success
+                {% else %}
+                    warning
+                {% endif %}
+            ">
+
+                <h3>
+                    Convergence Status
+                </h3>
+
+                <p>
+                    {{ result.message }}
+                </p>
+
+                {% if result.diagonally_dominant %}
+
+                    <p style="margin-top: 8px;">
+                        ✓ The coefficient matrix is strictly
+                        diagonally dominant.
+                    </p>
+
+                {% else %}
+
+                    <p style="margin-top: 8px;">
+                        ⚠ The coefficient matrix is not strictly
+                        diagonally dominant. Convergence is
+                        therefore not guaranteed.
+                    </p>
+
+                {% endif %}
+
+            </div>
+
+
+            <!-- =============================================
+                 FINAL SOLUTION
+            ============================================== -->
+
+            {% if result.solution %}
+
+                <div class="input-section-title">
+                    Final Results
+                </div>
+
+                <div class="solution-grid">
+
+                    <div class="solution-card">
+
+                        <div class="variable">
+                            X₁
+                        </div>
+
+                        <div class="value">
+                            {{ "%.8f"|format(result.solution[0]) }}
+                        </div>
+
+                    </div>
+
+
+                    <div class="solution-card">
+
+                        <div class="variable">
+                            X₂
+                        </div>
+
+                        <div class="value">
+                            {{ "%.8f"|format(result.solution[1]) }}
+                        </div>
+
+                    </div>
+
+
+                    <div class="solution-card">
+
+                        <div class="variable">
+                            X₃
+                        </div>
+
+                        <div class="value">
+                            {{ "%.8f"|format(result.solution[2]) }}
+                        </div>
+
+                    </div>
+
+                </div>
+
+            {% endif %}
+
+
+
+            <!-- =============================================
+                 ITERATION TABLE
+            ============================================== -->
+
+            <div class="input-section-title">
+                Iteration Breakdown
+            </div>
+
+            <div class="table-container">
+
+                <table>
+
+                    <thead>
+
+                        <tr>
+                            <th>Iteration</th>
+                            <th>X₁</th>
+                            <th>X₂</th>
+                            <th>X₃</th>
+                            <th>Maximum Error</th>
+                        </tr>
+
+                    </thead>
+
+                    <tbody>
+
+                        {% for row in result.iterations %}
+
+                        <tr>
+
+                            <td>
+                                {{ row.iteration }}
+                            </td>
+
+                            <td>
+                                {{ "%.8f"|format(row.x1) }}
+                            </td>
+
+                            <td>
+                                {{ "%.8f"|format(row.x2) }}
+                            </td>
+
+                            <td>
+                                {{ "%.8f"|format(row.x3) }}
+                            </td>
+
+                            <td>
+                                {{ "%.10f"|format(row.error) }}
+                            </td>
+
+                        </tr>
+
+                        {% endfor %}
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </div>
+
+        {% endif %}
+
+    </div>
+
+</section>
+
+
+
+<!-- =====================================================
+     FOOTER
+===================================================== -->
+
+<footer>
+
+    <p>
+        GAUSS SEIDEL CALCULATOR
+    </p>
+
+    <p style="margin-top: 8px;">
+        Built with Python & Flask
+    </p>
+
+</footer>
+
+
+</body>
+</html>
+                        
+  
