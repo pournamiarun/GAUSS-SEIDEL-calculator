@@ -23,5 +23,5 @@ A lightweight, interactive web application built with **Python** and **Flask** d
    ```
 3. Run the application:
    ```bash
-   python app.py
+   python app2.py
    ```
